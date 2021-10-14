@@ -1,0 +1,34 @@
+- hosts: docker
+  tasks:
+    - name: Set facts
+      set_fact:
+        day_stamp: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+        backup_root: "/mnt/server/docker/backups"
+        images:
+          - bazarr
+    - name: Ensures backup directories exists
+      file:
+        path: '{{ backup_root }}/{{ item }}'
+        state: directory
+      with_items: "{{ images }}"
+    - name: Find old backups
+      find:
+        paths: '{{ backup_root }}'
+        age: 7d
+        recurse: yes
+      register: old_backups
+    - name: Remove old backups
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ old_backups.files }}"
+    - name: Backup docker images
+      community.general.archive:
+        format: bz2
+        path:
+          - "~/config/{{ item }}/*"
+          - "~/compose/{{ item }}/docker-compose.yml"
+        dest: "{{ backup_root }}/{{ item }}/{{ item }}_{{ day_stamp }}.tar.bz2"
+        exclude_path:
+          - "~/config/{{ item }}/MediaCover"
+      with_items: "{{ images }}"

@@ -1,0 +1,26 @@
+global:
+        instanceName: {{ inventory_hostname }}
+        integrations:
+                - homeAssistant
+                - bluetoothClassic
+cluster:
+        port: {{ cluster_port }}
+homeAssistant:
+        mqttUrl: '{{ mqtt_host }}'
+        mqttOptions:
+                username: {{ mqtt_user }}
+                password: {{ mqtt_pass }}
+bluetoothLowEnergy:
+        maxDistance: 9
+        allowlist:
+                - '9ce557ca354a4f2295b30c1e1a3a580e-100-1'
+        tagOverrides:
+                '9ce557ca354a4f2295b30c1e1a3a580e-100-1':
+                        name: Patrick Phone
+bluetoothClassic:
+        addresses:
+                - '58:24:29:45:42:68'
+        entityOverrides:
+                '58:24:29:45:42:68':
+                        id: pcon-phone
+                        name: Patrick Phone

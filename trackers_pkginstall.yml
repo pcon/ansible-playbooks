@@ -1,0 +1,33 @@
+- hosts: trackers 
+  become: true
+  become_user: root
+  vars_files:
+    - credentials.yml
+  tasks:
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Install needed packages
+      apt:
+        pkg:
+        - build-essential
+        - libavahi-compat-libdnssd-dev
+        - libsystemd-dev
+        - bluetooth
+        - libbluetooth-dev
+        - libudev-dev
+        - libcairo2-dev
+        - libpango1.0-dev
+        - libjpeg-dev
+        - libgif-dev
+        - librsvg2-dev
+        - vim
+        - bluez
+    - name: Alert completion
+      pushover:
+        msg: "Trackers installed"
+        title: "Ansible"
+        app_token: "{{ pushover_token }}"
+        user_key: "{{ pushover_user }}"
+      delegate_to: localhost
+      run_once: true

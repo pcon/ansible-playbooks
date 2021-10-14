@@ -1,0 +1,15 @@
+- name: Syslog setup
+  hosts: all
+  become: true
+  become_user: root
+  vars_files:
+    - credentials.yml
+  tasks:
+    - name: Update rsyslog configuration
+      lineinfile: dest=/etc/rsyslog.conf backup=yes line="*.* @@{{ syslog_server }}:514" state=present
+      register: local_config
+    - name: Restart room assistant
+      service:
+        name: rsyslog
+        state: restarted
+      when: local_config.changed

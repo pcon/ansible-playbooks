@@ -1,0 +1,17 @@
+- name: Room Assistant configuration
+  hosts: trackers
+  tasks:
+    - name: Create config directory
+      file:
+        path: $HOME/room-assistant/config
+        state: directory
+    - name: Create local config
+      template:
+        src: local.yml.j2
+        dest: $HOME/room-assistant/config/local.yml
+      register: local_config
+    - name: Restart room assistant
+      service:
+        name: room-assistant
+        state: restarted
+      when: local_config.changed

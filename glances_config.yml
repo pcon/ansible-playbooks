@@ -1,0 +1,31 @@
+- name: Glances configuration
+  hosts: glances
+  vars_files:
+    - credentials.yml
+  tasks:
+    - name: Create config directory
+      file:
+        path: $HOME/.config/glances/
+        state: directory
+    - name: Create local config
+      template:
+        src: glances.conf.j2
+        dest: $HOME/.config/glances/glances.conf
+      register: glances_config
+    - name: Create service file
+      become: true
+      template:
+        src: glances.service.j2
+        dest: /etc/systemd/system/glances.service
+        owner: root
+        group: root
+        mode: 644
+    - name: Enable glances
+      service:
+        name: glances
+        enabled: yes
+    - name: Restart glances
+      service:
+        name: glances
+        state: restarted
+      when: glances_config.changed

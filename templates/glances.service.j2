@@ -1,0 +1,12 @@
+[Unit]
+Description=Glances
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/glances -w --disable-webui
+Restart=on-abort
+RemainAfterExit=yes
+User={{ ansible_user }}
+
+[Install]
+WantedBy=multi-user.target
